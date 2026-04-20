@@ -51,3 +51,7 @@ func (c *NpciClient) LinkAccount(ctx context.Context, vpaId string, accountId st
 	
 	return nil 
 }
+
+func (c *NpciClient) CreateAccount(ctx context.Context, name string, phone string, mpinHash string) error {
+	return nil 
+}

@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/swastiijain24/psp/internal/httpclient"
 	"github.com/swastiijain24/psp/internal/utils"
@@ -33,4 +34,41 @@ func (s *Accountsvc) LinkAccount(ctx context.Context, vpaId string, accountId st
 		return err  
 	}
 	return nil 
+}
+
+func (s *Accountsvc) CreateAccount(ctx context.Context, name string, phone string, mpin string) error {
+	err := utils.ValidateMPIN(mpin) 
+	if err!= nil {
+		return err 
+	}
+
+	if name == "" {
+		return fmt.Errorf("name cannot be null")
+	}
+
+	cleanPhone , err := utils.ValidatePhoneNumber(phone)
+	if err != nil {
+		return err 
+	}
+
+	encryptedPin, err := utils.EncryptAES(mpin,[]byte(os.Getenv("MPIN_ENCRYPTION_KEY")))
+	if err != nil {
+		return err 
+	}
+
+	err = s.npciClient.CreateAccount(ctx, name, cleanPhone, encryptedPin)
+	if err != nil {
+		return err 
+	}
+
+	return nil 
+}
+
+func (s *Accountsvc) GetBalance (){
+
+}
+
+
+func (s *Accountsvc) GetTransactions (){
+
 }

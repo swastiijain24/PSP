@@ -20,13 +20,36 @@ func (h *AccountHandler) LinkAccount(c *gin.Context) {
 	if err := c.ShouldBindJSON(&linkReq); err != nil {
 		c.JSON(400, gin.H{"error":err})
 	}
-	// response := h.accountService.LinkAccount(c.Request.Context(), linkReq.VpaId, linkReq.AccountId, linkReq.BankCode)
+	err := h.accountService.LinkAccount(c.Request.Context(), linkReq.VpaId, linkReq.AccountId, linkReq.BankCode)
+	if err != nil {
+		c.JSON(400, gin.H{"error":err})
+	}
+	c.JSON(201, gin.H{"response":"Account linked successfully"})
+}
 
-	// c.JSON(201, gin.H{"response":response})
+func (h *AccountHandler) CreateAccount(c *gin.Context){
+	var accReq CreateAccountReq 
+	if err := c.ShouldBindJSON(&accReq); err != nil{
+		c.JSON(400, gin.H{"error":err})
+	}
+	account, err := h.accountService.CreateAccount(c.Request.Context(), accReq.Name, accReq.Phone, accReq.Mpin)
+	if err != nil {
+		c.JSON(400, gin.H{"error":err})
+	} 
+	
+	c.JSON(201, gin.H{"account":account})
+
 }
 
 type LinkAccountReq struct {
 	VpaId     string `json:"vpa_id" binding:"required"`
 	AccountId string `json:"account_id" binding:"required"`
 	BankCode  string `json:"bank_code" binding:"required"`
+}
+
+
+type CreateAccountReq struct {
+    Name  string `json:"name" binding:"required,min=1,max=255"`
+    Phone string `json:"phone" binding:"required,e164"`  
+	Mpin string `json:"mpin_hash" binding:"required"`
 }
