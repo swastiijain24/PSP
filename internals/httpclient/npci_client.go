@@ -53,5 +53,40 @@ func (c *NpciClient) LinkAccount(ctx context.Context, vpaId string, accountId st
 }
 
 func (c *NpciClient) CreateAccount(ctx context.Context, name string, phone string, mpinHash string) error {
+	body, _ := json.Marshal(map[string]interface{}{
+		"name":name, 
+		"phone":phone,
+		"mpin_hash":mpinHash,
+	})
+
+	url := "/accounts/"
+	req, _ := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json") 
+
+	_, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return err 
+	}
 	return nil 
+}
+
+func (c *NpciClient) PaymentRequest(ctx context.Context, transactionId string, payerVpa string, payeeVpa string, amount int64, mpin string) error {
+	body, _ := json.Marshal(map[string]interface{}{
+		"transaction_id":transactionId,
+		"payer_vpa":payerVpa,
+		"payee_vpa":payeeVpa,
+		"amount":amount,
+		"mpin":mpin,
+	})
+
+	url := "/npci/payment"
+	req, _ := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json") 
+
+	_, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return err 
+	}
+	return nil 
+
 }
