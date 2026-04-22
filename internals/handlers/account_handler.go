@@ -43,12 +43,12 @@ func (h *AccountHandler) Link(c *gin.Context) {
 func (h *AccountHandler) SetMpin(c *gin.Context) {
 	vpaId := c.Param("vpaId")
 
-	var MpinEn string
-	if err := c.ShouldBindJSON(&MpinEn); err != nil {
+	var Mpin string
+	if err := c.ShouldBindJSON(&Mpin); err != nil {
 		c.JSON(400, gin.H{"error": err})
 	}
 
-	err := h.accountService.SetMpin(c.Request.Context(), vpaId, MpinEn)
+	err := h.accountService.SetMpin(c.Request.Context(), vpaId, Mpin)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err})
 	}
@@ -58,12 +58,12 @@ func (h *AccountHandler) SetMpin(c *gin.Context) {
 func (h *AccountHandler) ChangeMpin(c *gin.Context) {
 	vpaId := c.Param("vpaId")
 
-	var oldMpinEn string
-	if err := c.ShouldBindJSON(&oldMpinEn); err != nil {
+	var mpins Mpins
+	if err := c.ShouldBindJSON(&mpins); err != nil {
 		c.JSON(400, gin.H{"error": err})
 	}
 
-	err := h.accountService.ChangeMpin(c.Request.Context(), vpaId, oldMpinEn)
+	err := h.accountService.ChangeMpin(c.Request.Context(), vpaId, mpins.OldMpin, mpins.NewMpin)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err})
 	}
@@ -82,11 +82,11 @@ func (h *AccountHandler) GetTransactionHistory(c *gin.Context) {
 func (h *AccountHandler) GetBalance(c *gin.Context) {
 	vpaId := c.Param("vpaId")
 
-	var MpinEn string
-	if err := c.ShouldBindJSON(&MpinEn); err != nil {
+	var Mpin string
+	if err := c.ShouldBindJSON(&Mpin); err != nil {
 		c.JSON(400, gin.H{"error": err})
 	}
-	balance, err := h.accountService.GetBalance(c.Request.Context(), vpaId, MpinEn)
+	balance, err := h.accountService.GetBalance(c.Request.Context(), vpaId, Mpin)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "error fetching account balance"})
 	}
@@ -102,4 +102,9 @@ type LinkAccountReq struct {
 type AccountReq struct {
 	Phone    string `json:"phone" binding:"required,e164"`
 	BankCode string `json:"bank_code" binding:"required"`
+}
+
+type Mpins struct{
+	OldMpin string `json:"old_mpin" binding:"required"`
+	NewMpin string `json:"new_mpin" binding:"required"`
 }

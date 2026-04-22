@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"os"
-
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"

@@ -14,7 +14,7 @@ type Client interface {
 	DiscoverAccounts(ctx context.Context, phone string, bankCode string) ([]string, error)
 	LinkAccount(ctx context.Context, vpaId string, accountId string, bankCode string) error
 	SetMpin(ctx context.Context, vpaId string, mpinEn string) error
-	ChangeMpin(ctx context.Context, vpaId string, oldMpinEn string) error
+	ChangeMpin(ctx context.Context, vpaId string, oldMpinEn string, newMpinEn string) error
 	GetBalance(ctx context.Context, vpaId string, mpinEn string) (int64, error)
 	PaymentRequest(ctx context.Context, transactionId string, payerVpa string, payeeVpa string, amount int64, mpin string) error
 	GetStatus(ctx context.Context, transactionid string) (string, error)
@@ -105,10 +105,11 @@ func (c *NpciClient) SetMpin(ctx context.Context, vpaId string, mpinEn string) e
 	return nil
 }
 
-func (c *NpciClient) ChangeMpin(ctx context.Context, vpaId string, oldMpinEn string) error {
+func (c *NpciClient) ChangeMpin(ctx context.Context, vpaId string, oldMpinEn string, newMpinEn string) error {
 	body, _ := json.Marshal(map[string]interface{}{
 		"vpa_id":             vpaId,
 		"old_mpin_encrypted": oldMpinEn,
+		"new_mpin_encrypted" :newMpinEn,
 	})
 
 	url := fmt.Sprintf("%s/mpin", c.BaseURL)

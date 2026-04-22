@@ -3,6 +3,8 @@ package services
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"github.com/swastiijain24/psp/internals/httpclient"
 	repo "github.com/swastiijain24/psp/internals/repositories"
 	"github.com/swastiijain24/psp/internals/utils"
@@ -12,8 +14,8 @@ type AccountService interface {
 	DiscoverAccounts(ctx context.Context, phone string, bankCode string) ([]string, error)
 	LinkAccount(ctx context.Context, vpaId, accountId string, bankCode string) error
 	GetTransactionHistory(ctx context.Context, vpaId string) ([]repo.Transaction, error)
-	SetMpin(ctx context.Context, vpaId string, Mpin string) error
-	ChangeMpin(ctx context.Context, vpaId string, oldMpinEn string ) error
+	SetMpin(ctx context.Context, vpaId string, mpin string) error
+	ChangeMpin(ctx context.Context, vpaId string, oldMpin string, newMpin string) error
 	GetBalance(ctx context.Context, vpaId string, MpinEn string) (string, error)
 }
 
@@ -57,23 +59,64 @@ func (s *Accountsvc) LinkAccount(ctx context.Context, vpaId string, accountId st
 	return nil
 }
 
-func (s *Accountsvc) SetMpin(ctx context.Context, vpaId string, mpinEn string) error {
-	err := s.npciClient.SetMpin(ctx, vpaId, mpinEn)
+func (s *Accountsvc) SetMpin(ctx context.Context, vpaId string, mpin string) error {
+
+	err := utils.ValidateMPIN(mpin)
+	if err != nil {
+		return err
+	}
+
+	mpinEn, err := utils.EncryptAES(mpin, []byte(os.Getenv("MPIN_ENCRYPTION_KEY")))
+	if err != nil {
+		return err
+	}
+
+	err = s.npciClient.SetMpin(ctx, vpaId, mpinEn)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *Accountsvc) ChangeMpin(ctx context.Context, vpaId string, oldMpinEn string) error {
-	err := s.npciClient.ChangeMpin(ctx, vpaId, oldMpinEn)
+func (s *Accountsvc) ChangeMpin(ctx context.Context, vpaId string, oldMpin string, newMpin string) error {
+
+	err := utils.ValidateMPIN(oldMpin)
+	if err != nil {
+		return err
+	}
+	err = utils.ValidateMPIN(newMpin)
+	if err != nil {
+		return err
+	}
+	oldMpinEn, err := utils.EncryptAES(oldMpin, []byte(os.Getenv("MPIN_ENCRYPTION_KEY")))
+	if err != nil {
+		return err
+	}
+
+	newMpinEn, err := utils.EncryptAES(newMpin, []byte(os.Getenv("MPIN_ENCRYPTION_KEY")))
+	if err != nil {
+		return err
+	}
+
+	err = s.npciClient.ChangeMpin(ctx, vpaId, oldMpinEn, newMpinEn)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *Accountsvc) GetBalance(ctx context.Context, vpaId string, mpinEn string) (string, error) {
+func (s *Accountsvc) GetBalance(ctx context.Context, vpaId string, mpin string) (string, error) {
+
+	err := utils.ValidateMPIN(mpin)
+	if err != nil {
+		return "", err
+	}
+
+	mpinEn, err := utils.EncryptAES(mpin, []byte(os.Getenv("MPIN_ENCRYPTION_KEY")))
+	if err != nil {
+		return "", err
+	}
+
 	paise, err := s.npciClient.GetBalance(ctx, vpaId, mpinEn)
 	if err != nil {
 		return "", err
