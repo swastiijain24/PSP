@@ -4,9 +4,15 @@ import (
 	"context"
 	"log"
 	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
+	"github.com/swastiijain24/psp/internals/handlers"
+	"github.com/swastiijain24/psp/internals/httpclient"
+	repo "github.com/swastiijain24/psp/internals/repositories"
+	"github.com/swastiijain24/psp/internals/routes"
+	"github.com/swastiijain24/psp/internals/services"
 )
 
 func main() {
@@ -23,5 +29,16 @@ func main() {
 	log.Printf("connected to database")
 
 	r := gin.New()
+
+	repo := repo.New(pool)
+	npciClient := httpclient.NewNpciClient(os.Getenv("BASE_URL"))
+	transactionService := services.NewTransactionService(repo)
+	accountService := services.NewAccountService(npciClient, transactionService)
+	accountHandler := handlers.NewAccountHandler(accountService)
+	paymentService := services.NewPaymentService(repo, npciClient)
+	paymentHandler := handlers.NewPaymentHandler(paymentService)
+
+	routes.RegisterAccountRoutes(r, accountHandler)
+	routes.RegisterPaymentRoutes(r, paymentHandler)
 
 }
