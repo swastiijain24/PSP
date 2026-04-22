@@ -37,3 +37,9 @@ func RupeesToPaise(amount string) (int64, error) {
 
 	return 0, fmt.Errorf("invalid amount format")
 }
+
+func PaiseToRupees(paise int64) string {
+	rupees := paise / 100
+	remainingPaise := paise % 100
+	return fmt.Sprintf("%d.%02d", rupees, remainingPaise)
+}

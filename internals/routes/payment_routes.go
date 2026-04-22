@@ -9,5 +9,6 @@ func RegisterPaymentRoutes(r *gin.Engine, paymentHandler *handlers.PaymentHandle
 	paymentRoutes := r.Group("/payment")
 	{
 		paymentRoutes.POST("/pay", paymentHandler.Pay)
+		paymentRoutes.GET("/status/:txnid", paymentHandler.GetStatus)	
 	}
 }

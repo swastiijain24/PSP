@@ -28,6 +28,17 @@ func (h *PaymentHandler) Pay(c *gin.Context) {
 	}
 }
 
+func (h *PaymentHandler) GetStatus(c *gin.Context){
+	transactionId := c.Param("txnid")
+
+	status, err := h.paymentService.GetStatus(c.Request.Context(), transactionId)
+	if err != nil {
+		c.JSON(400, gin.H{"error":err})
+		return 
+	}
+	c.JSON(200, gin.H{"status":status})
+}
+
 type paymentParams struct {
 	PayerVPA string `json:"payer_vpa" binding:"required"`
 	PayeeVPA string `json:"payee_vpa" binding:"required"`

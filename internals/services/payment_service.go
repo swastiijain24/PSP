@@ -13,14 +13,15 @@ import (
 
 type PaymentService interface {
 	Pay(ctx context.Context, payerVpa string, payeeVpa string, amount string, mpin string, remarks string) error
+	GetStatus(ctx context.Context, transactionId string) (string , error)
 }
 
 type PaymentSvc struct {
-	npciClient *httpclient.NpciClient
+	npciClient httpclient.Client
 	repo       repo.Querier
 }
 
-func NewPaymentService(repo repo.Querier, npciClient *httpclient.NpciClient) PaymentService {
+func NewPaymentService(repo repo.Querier, npciClient httpclient.Client) PaymentService {
 	return &PaymentSvc{
 		repo:       repo,
 		npciClient: npciClient,
@@ -62,7 +63,11 @@ func (s *PaymentSvc) Pay(ctx context.Context, payerVpa string, payeeVpa string, 
 		Remarks: utils.ToPGText(remarks),
 	})
 
-	s.npciClient.PaymentRequest(ctx, transactionId, payerVpa, payeeVpa, amountInPaise, mpinEncrypted)
+	err = s.npciClient.PaymentRequest(ctx, transactionId, payerVpa, payeeVpa, amountInPaise, mpinEncrypted)
 
 	return nil
+}
+
+func (s *PaymentSvc) GetStatus(ctx context.Context, transactionId string) (string , error){
+	return s.npciClient.GetStatus(ctx, transactionId)
 }

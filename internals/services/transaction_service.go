@@ -7,7 +7,7 @@ import (
 )
 
 type TransactionService interface{
-
+	GetTransactionHistory(ctx context.Context, vpdaId string) ([]repo.Transaction, error)
 }
 
 type TransactionSvc struct{
@@ -20,6 +20,10 @@ func NewTransactionService(repo repo.Querier) TransactionService {
 	}
 }
 
-func GetTransactionHistory(ctx context.Context, accountId string) ([]repo.Transaction, error){
-	
+func (s* TransactionSvc) GetTransactionHistory(ctx context.Context, vpdaId string) ([]repo.Transaction, error){
+	return s.repo.GetTransactionHistory(ctx, repo.GetTransactionHistoryParams{
+		PayerVpa: vpdaId,
+		Limit: 10,
+		Offset: 20,
+	})
 }

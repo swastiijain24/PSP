@@ -8,9 +8,11 @@ import (
 func RegisterAccountRoutes(r *gin.Engine, accountHandler *handlers.AccountHandler) {
 	accountRoutes := r.Group("/account")
 	{
-		accountRoutes.POST("/create-account", accountHandler.CreateAccount)
-		accountRoutes.POST("/link-account", accountHandler.LinkAccount)
-		accountRoutes.GET("balance/:id", accountHandler.GetBalance)
-		accountRoutes.GET("transactions/:id", accountHandler.GetTransactionHistory)
+		accountRoutes.POST("/discover", accountHandler.Discover)
+		accountRoutes.POST("/link", accountHandler.Link)
+		accountRoutes.POST("/mpin", accountHandler.SetMpin)
+		accountRoutes.PUT("/mpin", accountHandler.ChangeMpin)
+		accountRoutes.GET("balance/:vpaId", accountHandler.GetBalance)
+		accountRoutes.GET("transactions/:vpaId?page=1&limit=20", accountHandler.GetTransactionHistory)
 	}
 }
