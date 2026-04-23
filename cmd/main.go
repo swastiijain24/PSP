@@ -41,4 +41,6 @@ func main() {
 	routes.RegisterAccountRoutes(r, accountHandler)
 	routes.RegisterPaymentRoutes(r, paymentHandler)
 
+	r.Run(":" + os.Getenv("PORT"))
+
 }

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -52,6 +53,8 @@ func (c *NpciClient) DiscoverAccounts(ctx context.Context, phone string, bankCod
 	url := fmt.Sprintf("%s/account/discover", c.BaseURL)
 	req, _ := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-API-Key", os.Getenv("PSP_API_KEY"))
+	req.Header.Set("X-PSP-ID", os.Getenv("PSP_ID"))
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -78,6 +81,8 @@ func (c *NpciClient) LinkAccount(ctx context.Context, vpaId string, accountId st
 	url := fmt.Sprintf("%s/vpa/register", c.BaseURL)
 	req, _ := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-API-Key", os.Getenv("PSP_API_KEY"))
+	req.Header.Set("X-PSP-ID", os.Getenv("PSP_ID"))
 
 	_, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -96,6 +101,8 @@ func (c *NpciClient) SetMpin(ctx context.Context, vpaId string, mpinEn string) e
 	url := fmt.Sprintf("%s/mpin", c.BaseURL)
 	req, _ := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-API-Key", os.Getenv("PSP_API_KEY"))
+	req.Header.Set("X-PSP-ID", os.Getenv("PSP_ID"))
 
 	_, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -115,6 +122,8 @@ func (c *NpciClient) ChangeMpin(ctx context.Context, vpaId string, oldMpinEn str
 	url := fmt.Sprintf("%s/mpin", c.BaseURL)
 	req, _ := http.NewRequestWithContext(ctx, "PUT", url, bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-API-Key", os.Getenv("PSP_API_KEY"))
+	req.Header.Set("X-PSP-ID", os.Getenv("PSP_ID"))
 
 	_, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -133,6 +142,8 @@ func (c *NpciClient) GetBalance(ctx context.Context, vpaId string, mpinEn string
 	url := fmt.Sprintf("%s/mpin", c.BaseURL)
 	req, _ := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-API-Key", os.Getenv("PSP_API_KEY"))
+	req.Header.Set("X-PSP-ID", os.Getenv("PSP_ID"))
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -161,6 +172,8 @@ func (c *NpciClient) PaymentRequest(ctx context.Context, transactionId string, p
 	url := fmt.Sprintf("%s/npci/payment", c.BaseURL)
 	req, _ := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-API-Key", os.Getenv("PSP_API_KEY"))
+	req.Header.Set("X-PSP-ID", os.Getenv("PSP_ID"))
 
 	_, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -174,6 +187,8 @@ func (c *NpciClient) GetStatus(ctx context.Context, transactionid string) (strin
 	url := fmt.Sprintf("%s/npci/status/%s", c.BaseURL, transactionid)
 
 	req, _ := http.NewRequestWithContext(ctx, "GET", url, nil)
+	req.Header.Set("X-API-Key", os.Getenv("PSP_API_KEY"))
+	req.Header.Set("X-PSP-ID", os.Getenv("PSP_ID"))
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
