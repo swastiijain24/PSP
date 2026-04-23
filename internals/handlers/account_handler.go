@@ -19,38 +19,44 @@ func (h *AccountHandler) Discover(c *gin.Context) {
 	var accReq AccountReq
 	if err := c.ShouldBindJSON(&accReq); err != nil {
 		c.JSON(400, gin.H{"error": err})
+		return
 	}
 	accounts, err := h.accountService.DiscoverAccounts(c.Request.Context(), accReq.Phone, accReq.BankCode)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err})
+		return
 	}
 
-	c.JSON(201, gin.H{"accounts": accounts})
+	c.JSON(200, gin.H{"accounts": accounts})
 }
 
 func (h *AccountHandler) Link(c *gin.Context) {
 	var linkReq LinkAccountReq
 	if err := c.ShouldBindJSON(&linkReq); err != nil {
 		c.JSON(400, gin.H{"error": err})
+		return
 	}
 	err := h.accountService.LinkAccount(c.Request.Context(), linkReq.VpaId, linkReq.AccountId, linkReq.BankCode)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err})
+		return
 	}
-	c.JSON(201, gin.H{"response": "Account linked successfully"})
+	c.JSON(200, gin.H{"response": "Account linked successfully"})
 }
 
 func (h *AccountHandler) SetMpin(c *gin.Context) {
 	vpaId := c.Param("vpaId")
 
-	var Mpin string
-	if err := c.ShouldBindJSON(&Mpin); err != nil {
+	var mpin Mpin
+	if err := c.ShouldBindJSON(&mpin); err != nil {
 		c.JSON(400, gin.H{"error": err})
+		return
 	}
 
-	err := h.accountService.SetMpin(c.Request.Context(), vpaId, Mpin)
+	err := h.accountService.SetMpin(c.Request.Context(), vpaId, mpin.Mpin)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err})
+		return
 	}
 	c.JSON(200, gin.H{"response": "Mpin set successfully"})
 }
@@ -61,11 +67,13 @@ func (h *AccountHandler) ChangeMpin(c *gin.Context) {
 	var mpins Mpins
 	if err := c.ShouldBindJSON(&mpins); err != nil {
 		c.JSON(400, gin.H{"error": err})
+		return
 	}
 
 	err := h.accountService.ChangeMpin(c.Request.Context(), vpaId, mpins.OldMpin, mpins.NewMpin)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err})
+		return
 	}
 	c.JSON(200, gin.H{"response": "Mpin set successfully"})
 }
@@ -75,6 +83,7 @@ func (h *AccountHandler) GetTransactionHistory(c *gin.Context) {
 	transactions, err := h.accountService.GetTransactionHistory(c.Request.Context(), vpaId)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err})
+		return
 	}
 	c.JSON(200, transactions)
 }
@@ -82,13 +91,15 @@ func (h *AccountHandler) GetTransactionHistory(c *gin.Context) {
 func (h *AccountHandler) GetBalance(c *gin.Context) {
 	vpaId := c.Param("vpaId")
 
-	var Mpin string
-	if err := c.ShouldBindJSON(&Mpin); err != nil {
+	var mpin Mpin
+	if err := c.ShouldBindJSON(&mpin); err != nil {
 		c.JSON(400, gin.H{"error": err})
+		return
 	}
-	balance, err := h.accountService.GetBalance(c.Request.Context(), vpaId, Mpin)
+	balance, err := h.accountService.GetBalance(c.Request.Context(), vpaId, mpin.Mpin)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "error fetching account balance"})
+		return 
 	}
 	c.JSON(200, gin.H{"balance": balance})
 }
@@ -104,7 +115,11 @@ type AccountReq struct {
 	BankCode string `json:"bank_code" binding:"required"`
 }
 
-type Mpins struct{
+type Mpins struct {
 	OldMpin string `json:"old_mpin" binding:"required"`
 	NewMpin string `json:"new_mpin" binding:"required"`
+}
+
+type Mpin struct {
+	Mpin string `json:"mpin" binding:"required"`
 }

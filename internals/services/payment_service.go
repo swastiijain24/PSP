@@ -55,16 +55,22 @@ func (s *PaymentSvc) Pay(ctx context.Context, payerVpa string, payeeVpa string, 
 		return err
 	}
 
-	s.repo.CreateTransaction(ctx, repo.CreateTransactionParams{
+	_, err = s.repo.CreateTransaction(ctx, repo.CreateTransactionParams{
 		TransactionID: transactionId,
 		PayerVpa: payerVpa,
 		PayeeVpa: payeeVpa,
 		Amount: amountInPaise,
 		Remarks: utils.ToPGText(remarks),
 	})
+	if err != nil {
+		return err 
+	}
 
 	err = s.npciClient.PaymentRequest(ctx, transactionId, payerVpa, payeeVpa, amountInPaise, mpinEncrypted)
-
+	if err != nil {
+		return err 
+	}
+	
 	return nil
 }
 

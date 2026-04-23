@@ -12,7 +12,7 @@ func RegisterAccountRoutes(r *gin.Engine, accountHandler *handlers.AccountHandle
 		accountRoutes.POST("/link", accountHandler.Link)
 		accountRoutes.POST("/mpin", accountHandler.SetMpin)
 		accountRoutes.PUT("/mpin", accountHandler.ChangeMpin)
-		accountRoutes.GET("balance/:vpaId", accountHandler.GetBalance)
-		accountRoutes.GET("transactions/:vpaId?page=1&limit=20", accountHandler.GetTransactionHistory)
+		accountRoutes.POST("/balance/:vpaId", accountHandler.GetBalance)
+		accountRoutes.GET("/transactions/:vpaId?page=1&limit=20", accountHandler.GetTransactionHistory)
 	}
 }

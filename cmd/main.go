@@ -10,7 +10,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/swastiijain24/psp/internals/handlers"
 	"github.com/swastiijain24/psp/internals/httpclient"
-	repo "github.com/swastiijain24/psp/internals/repositories"
+	"github.com/swastiijain24/psp/internals/repositories"
 	"github.com/swastiijain24/psp/internals/routes"
 	"github.com/swastiijain24/psp/internals/services"
 )

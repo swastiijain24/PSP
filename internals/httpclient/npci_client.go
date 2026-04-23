@@ -27,8 +27,9 @@ type NpciClient struct {
 }
 
 func NewNpciClient(url string) Client {
+	allowInsecureTLS := os.Getenv("ALLOW_INSECURE_TLS") == "true"
 	tlsConfig := &tls.Config{
-		InsecureSkipVerify: true, //must set to false in production
+		InsecureSkipVerify: allowInsecureTLS,
 	}
 
 	transport := &http.Transport{
@@ -84,9 +85,14 @@ func (c *NpciClient) LinkAccount(ctx context.Context, vpaId string, accountId st
 	req.Header.Set("X-API-Key", os.Getenv("PSP_API_KEY"))
 	req.Header.Set("X-PSP-ID", os.Getenv("PSP_ID"))
 
-	_, err := c.HTTPClient.Do(req)
+	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bank returned error :%d", resp.StatusCode)
 	}
 
 	return nil
@@ -104,11 +110,15 @@ func (c *NpciClient) SetMpin(ctx context.Context, vpaId string, mpinEn string) e
 	req.Header.Set("X-API-Key", os.Getenv("PSP_API_KEY"))
 	req.Header.Set("X-PSP-ID", os.Getenv("PSP_ID"))
 
-	_, err := c.HTTPClient.Do(req)
+	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bank returned error :%d", resp.StatusCode)
+	}
 	return nil
 }
 
@@ -116,7 +126,7 @@ func (c *NpciClient) ChangeMpin(ctx context.Context, vpaId string, oldMpinEn str
 	body, _ := json.Marshal(map[string]interface{}{
 		"vpa_id":             vpaId,
 		"old_mpin_encrypted": oldMpinEn,
-		"new_mpin_encrypted" :newMpinEn,
+		"new_mpin_encrypted": newMpinEn,
 	})
 
 	url := fmt.Sprintf("%s/mpin", c.BaseURL)
@@ -125,9 +135,14 @@ func (c *NpciClient) ChangeMpin(ctx context.Context, vpaId string, oldMpinEn str
 	req.Header.Set("X-API-Key", os.Getenv("PSP_API_KEY"))
 	req.Header.Set("X-PSP-ID", os.Getenv("PSP_ID"))
 
-	_, err := c.HTTPClient.Do(req)
+	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bank returned error :%d", resp.StatusCode)
 	}
 
 	return nil
@@ -175,9 +190,14 @@ func (c *NpciClient) PaymentRequest(ctx context.Context, transactionId string, p
 	req.Header.Set("X-API-Key", os.Getenv("PSP_API_KEY"))
 	req.Header.Set("X-PSP-ID", os.Getenv("PSP_ID"))
 
-	_, err := c.HTTPClient.Do(req)
+	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bank returned error :%d", resp.StatusCode)
 	}
 	return nil
 
@@ -192,12 +212,12 @@ func (c *NpciClient) GetStatus(ctx context.Context, transactionid string) (strin
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return "", err
+		return "ERROR", err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", err
+		return "ERROR", err
 	}
 
 	var result string

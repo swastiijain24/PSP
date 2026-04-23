@@ -10,7 +10,9 @@ type PaymentHandler struct {
 }
 
 func NewPaymentHandler(paymentService services.PaymentService) *PaymentHandler {
-	return &PaymentHandler{}
+	return &PaymentHandler{
+		paymentService: paymentService,
+	}
 }
 
 func (h *PaymentHandler) Pay(c *gin.Context) {
