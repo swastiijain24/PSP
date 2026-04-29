@@ -41,6 +41,9 @@ func main() {
 	routes.RegisterAccountRoutes(r, accountHandler)
 	routes.RegisterPaymentRoutes(r, paymentHandler)
 
+	
+
+	log.Print("Server starting")
 	r.Run(":" + os.Getenv("PORT"))
 
 }

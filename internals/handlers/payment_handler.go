@@ -23,28 +23,29 @@ func (h *PaymentHandler) Pay(c *gin.Context) {
 		return
 	}
 
-	err = h.paymentService.Pay(c.Request.Context(), params.PayerVPA, params.PayeeVPA, params.Amount, params.Mpin, params.Remarks)
+	err = h.paymentService.Pay(c.Request.Context(),params.TransactionId, params.PayerVPA, params.PayeeVPA, params.Amount, params.Mpin, params.Remarks)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 }
 
-func (h *PaymentHandler) GetStatus(c *gin.Context){
+func (h *PaymentHandler) GetStatus(c *gin.Context) {
 	transactionId := c.Param("txnid")
 
 	status, err := h.paymentService.GetStatus(c.Request.Context(), transactionId)
 	if err != nil {
-		c.JSON(400, gin.H{"error":err})
-		return 
+		c.JSON(400, gin.H{"error": err})
+		return
 	}
-	c.JSON(200, gin.H{"status":status})
+	c.JSON(200, gin.H{"status": status})
 }
 
 type paymentParams struct {
-	PayerVPA string `json:"payer_vpa" binding:"required"`
-	PayeeVPA string `json:"payee_vpa" binding:"required"`
-	Amount   string `json:"amount" binding:"required"`
-	Mpin     string `json:"mpin" binding:"required"`
-	Remarks  string `json:"remarks" `
+	TransactionId string `json:"transaction_id" binding:"required"`
+	PayerVPA      string `json:"payer_vpa" binding:"required"`
+	PayeeVPA      string `json:"payee_vpa" binding:"required"`
+	Amount        string `json:"amount" binding:"required"`
+	Mpin          string `json:"mpin" binding:"required"`
+	Remarks       string `json:"remarks" `
 }

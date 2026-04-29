@@ -12,7 +12,7 @@ import (
 )
 
 type PaymentService interface {
-	Pay(ctx context.Context, payerVpa string, payeeVpa string, amount string, mpin string, remarks string) error
+	Pay(ctx context.Context,transactionId string, payerVpa string, payeeVpa string, amount string, mpin string, remarks string) error
 	GetStatus(ctx context.Context, transactionId string) (string , error)
 }
 
@@ -28,7 +28,11 @@ func NewPaymentService(repo repo.Querier, npciClient httpclient.Client) PaymentS
 	}
 }
 
-func (s *PaymentSvc) Pay(ctx context.Context, payerVpa string, payeeVpa string, amount string, mpin string, remarks string) error {
+func (s *PaymentSvc) Pay(ctx context.Context,transactionId string, payerVpa string, payeeVpa string, amount string, mpin string, remarks string) error {
+
+	if payerVpa == payeeVpa {
+		return fmt.Errorf("error")
+	}
 
 	num, err := strconv.Atoi(amount)
 	if err != nil {
@@ -38,12 +42,6 @@ func (s *PaymentSvc) Pay(ctx context.Context, payerVpa string, payeeVpa string, 
 	if num <= 0 {
 		return fmt.Errorf("invalid amount")
 	}
-
-	if payerVpa == payeeVpa {
-		return fmt.Errorf("error")
-	}
-
-	transactionId := utils.GenerateSortableTxnID()
 
 	amountInPaise, err := utils.RupeesToPaise(amount)
 	if err != nil {
